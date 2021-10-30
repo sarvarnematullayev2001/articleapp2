@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Share a post{% endblock %}
+
+{% block content %}
+    <div class="blog-section">
+        {% if sent %}
+            <h1>E-mail successfully sent</h1>
+            <p>
+            "{{ post.title }}" was successfully sent to {{ form.cleaned_data.to }}.
+            </p>
+        {% else %}
+            <h1>Share "{{ post.title }}" by e-mail</h1>
+            <form method="post">{% csrf_token %}
+                {{ form | crispy }}<br>
+                <input type="submit" class="btn btn-success" value="Send e-mail">
+            </form>
+        {% endif %}
+    </div>
+{% endblock %}

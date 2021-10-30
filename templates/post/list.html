@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+{% load blog_tags %}
+
+{% block title %}My Blogs{% endblock %}
+
+{% block content %}
+    <div class="welcome" style='background: url("/static/assets/img/colorful2.jpg") no-repeat scroll 0% 0% / cover;'>
+        <div class="welcome-container">
+            <p>Welcome to My Blog!!!</p>
+        </div>
+    </div>
+    <div class="site-inner">
+        <div class="content-sidebar-wrap" style="position: relative;">
+            <main class="content" style="display: flex; flex-wrap: wrap;">
+                {% if tag %}
+                    <h2 class="posts-tag">Posts tagged with "{{ tag.name }}"</h2>
+                {% endif %}
+                {% for post in posts %}
+                    <article class="type-post status-publish format-standard has-post-thumbnail category-tutorials tag-file-transfer-protocol tag-server-files tag-sftp entry">
+                        <div class="entry-header">
+                            {% if post.image %}
+                                <a class="entry-image-link" href="{% url 'post_detail' post.pk %}" aria-hidden='true' tabindex="-1" data-wpel-link='internal'>
+                                    <img src="{{ post.image.url }}" alt="{{ post.title }}">
+                                </a>
+                                <p class="entry-meta">
+                                    <time class="entry-time">
+                                        <i class="far fa-calendar"></i>{{ post.publish }}
+                                    </time>
+                                </p>
+                            {% endif %}
+                        </div>
+                        <div class="entry-content">
+                            <h2 class="entry-title">
+                                <a class="entry-title-link" href="{% url 'post_detail' post.pk %}" rel="bookmark" data-wpel-link="internal">{{ post.title }}</a>
+                            </h2>
+                            <p>{{ post.body | safe | markdown | truncatewords_html:15 | linebreaks }}</p>
+                        </div>
+                        <div class="entry-footer">
+                            <p class="entry-meta">
+                                {% for tag in post.tags.all %}
+                                    <span class="entry-categories">
+                                        <a href="{% url 'post_list_by_tag' tag.slug %}" rel='category tag' data-wpel-link="internal">{{ tag.name }}</a>
+                                        {% if not forloop.last %}, {% endif %}
+                                    </span>
+                                {% endfor %}
+                                <span class="entry-author">
+                                    {{ post.author }}
+                                </span>
+                            </p>
+                        </div>
+                    </article>
+                {% endfor %}
+            </main>
+            <aside class="sidebar sidebar-primary widget-area" role="complementary">
+                <h2>My blog</h2>
+                <p>This is my blog. I have written {% total_posts %} post so far.</p>
+                <h3>Latest posts</h3>
+                {% show_latest_posts 2 %}
+                <h3>Most commented posts</h3>
+                {% get_most_commented_posts as most_commented_posts %}
+                <ul>
+                    {% for post in most_commented_posts %}
+                        <li>
+                            <a href="{% url 'post_detail' post.pk %}">{{ post.title }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            </aside>
+        </div>
+    </div>
+    {% include 'post/pagination.html' with page=posts %}
+{% endblock %}

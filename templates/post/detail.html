@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+{% load blog_tags %}
+
+{% block title %}{{ post.title }}{% endblock %}
+
+{% block content %}
+    <div class="site-inner">
+        <div class="content-sidebar-wrap">
+            <div class="content-detail">
+                <article class="post status-publish format-standard has-post-thumbnail category-inspiration entry">
+                    <div class="entry-header">
+                        {% if post.image %}
+                            <img src="{{ post.image.url }}" alt="{{ post.title }}">
+                            <p class="entry-meta">
+                                <span class="entry-author-detail">
+                                    By
+                                    <span class="entry-author-name">
+                                        {{ post.author }}
+                                    </span>
+                                </span>
+                                <time class="entry-time">
+                                    {{ post.publish }}
+                                </time>
+                            </p>
+                        {% endif %}
+                    </div>
+                    <div class="entry-content-detail">
+                        <h2 class="entry-title-detail">{{ post.title }}</h2>
+                        <p>{{ post.body | safe | markdown | linebreaks }}</p>
+                    </div>
+                    <div class="btn-group" role="group" aria-label="Basic outlined example">
+                        <a href='{% url "post_edit" post.pk %}' type="button" class="btn btn-outline-primary">Edit Post</a>
+                        <a href='{% url "post_delete" post.pk %}' type="button" class="btn btn-outline-primary">Delete Post</a>
+                        <a href='{% url "post_share" post.pk %}' type="button" class="btn btn-outline-primary">Share Post</a>
+                        <a href='{% url "post_list" %}' type="button" class="btn btn-outline-primary">All Posts</a>
+                      </div>
+                </article>
+                <div class="post-share-buttons">
+                    <div class="fb-button share-buttons">
+                        <a href="https://www.facebook.com/sarvar.nematullayev.73" target='__blank' data-wpel-link='external' rel="nofollow external noopener noreferrer">
+                            <i class="fab fabd1 fa-facebook"></i>
+                        </a>
+                    </div>
+                    <div class="telegram-button share-buttons">
+                        <a href="https://t.me/sarvarjon_blogs" target='__blank' data-wpel-link='external' rel="nofollow external noopener noreferrer">
+                            <i class="fab fabd2 fa-telegram-plane"></i>
+                        </a>
+                    </div>
+                    <div class="github-button share-buttons">
+                        <a href="https://github.com/sarvarnematullayev2001" target='__blank' data-wpel-link='external' rel="nofollow external noopener noreferrer">
+                            <i class="fab fabd3 fa-github"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <aside class="sidebar sidebar-primary widget-area" role="complementary">
+                <h2>My blog</h2>
+                <p>This is my blog. I have written {% total_posts %} post so far.</p>
+                <h3>Latest posts</h3>
+                {% show_latest_posts %}
+                <h3>Most commented posts</h3>
+                {% get_most_commented_posts as most_commented_posts %}
+                <ul>
+                    {% for post in most_commented_posts %}
+                        <li>
+                            <a href="{% url 'post_detail' post.pk %}">{{ post.title }}</a>
+                        </li>
+                    {% endfor %}
+                </ul>
+                <h3 class="similar_posts">Similar posts</h3>
+                {% for post in similar_posts %}
+                    <p class="similar-posts__title">
+                        <a href="{{ post.get_absolute_url }}">{{ post.title }}</a><hr>
+                    </p>
+                {% empty %}
+                    There are no similar posts yet.
+                {% endfor %}
+            </aside>
+        </div>
+        <div class="comments-section">
+            {% with comments.count as total_comments %}
+                <h2 class="total_comments">
+                    {{ total_comments }} comment{{ total_comments | pluralize }}
+                </h2>
+            {% endwith %}
+            {% for comment in comments %}
+                <div class="comment">
+                    <p class="comment-info">
+                        <span>{{ comment.name }}</span> |
+                        <i>{{ comment.created }}</i>
+                    </p>
+                    <p class="comment-body">
+                        {{ comment.body | linebreaks }}
+                    </p>
+                </div>
+            {% empty %}
+                <p class="empty-comment">
+                    There is no comments yet.
+                </p>
+            {% endfor %}
+            {% if new_comment %}
+                <h2 class="comment-added">Your comment has been added.</h2>
+            {% else %}
+                <h2 class="add-new-comment">Add a new comment</h2>
+                <form method="post">{% csrf_token %}
+                    {{ comment_form | crispy }}
+                    <p><input type="submit" value="Add comment" class="btn btn-warning" style='color: white; font-weight: 700; background-color: #FE6935;'></p>
+                </form>
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% load crispy_forms_tags %}
+
+{% block title %}Create Post{% endblock %}
+
+{% block content %}
+    <div class="blog-section">
+        <h1 class="blog-section__title">Create Post</h1>
+        <form method="post" enctype="multipart/form-data">{% csrf_token %}
+            {{ form.media }}
+            {{ form | crispy }} <br>
+            <input type="submit" value="Create" class="btn btn-warning" style='color: white; font-weight: 700; background-color: #FE6935;'>
+        </form>
+    </div>
+{% endblock %} 
